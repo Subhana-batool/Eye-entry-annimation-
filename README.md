@@ -10,8 +10,8 @@ A premium minimal front-end website concept featuring an interactive eye-based e
 
 ### Interactive Eye Experience
 
-![Interactive Eye Experience](<img width="717" height="537" alt="Screenshot (1116)" src="https://github.com/user-attachments/assets/c87635bc-e56a-41c0-a485-aa4a640eaf1a" />
-)
+<img width="717" height="537" alt="Screenshot (1116)" src="https://github.com/user-attachments/assets/ab0e2209-3e1a-4620-a713-092e970a13b5" />
+
 
 
 
