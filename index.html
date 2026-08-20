@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Vantage — Advisory &amp; Foresight</title>
+<meta name="description" content="Vantage is a private advisory institution operating at the intersection of art, capital, and foresight." />
+
+<!-- Display serif for headings + a quiet grotesk for body/UI text -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,ital@9..144,300..600,0..1;9..144,300..600,1&family=Inter:wght@400;500&display=swap" rel="stylesheet" />
+
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- Accessible bypass: focus + activate to skip the hold gesture entirely.
+       Hidden visually until focused (standard skip-link pattern), for anyone
+       using a keyboard, switch device, or screen reader who can't perform a
+       press-and-hold pointer gesture. -->
+  <a href="#" id="skipEnter" class="skip-link">Enter site</a>
+
+  <!-- ================= EYE EXPERIENCE ================= -->
+  <div id="eyeExperience" class="eye-experience" aria-hidden="false">
+    <div class="eye-noise" aria-hidden="true"></div>
+
+    <div class="eye-stage">
+      <div
+        id="eyeHit"
+        class="eye-stage-inner"
+        role="button"
+        tabindex="0"
+        aria-label="Press and hold, or focus and hold Enter, for about two seconds to enter the site"
+      >
+        <svg id="eyeSvg" viewBox="0 0 300 220" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <defs>
+            <radialGradient id="irisGradient" cx="38%" cy="34%" r="75%">
+              <stop offset="0%"  stop-color="#e9d8ac" />
+              <stop offset="38%" stop-color="#c7a24b" />
+              <stop offset="72%" stop-color="#8a6f37" />
+              <stop offset="100%" stop-color="#4c3c1e" />
+            </radialGradient>
+
+            <radialGradient id="scleraGradient" cx="50%" cy="50%" r="65%">
+              <stop offset="0%"  stop-color="#17161a" />
+              <stop offset="100%" stop-color="#0b0a0c" />
+            </radialGradient>
+
+            <radialGradient id="pupilGradient" cx="42%" cy="38%" r="70%">
+              <stop offset="0%"  stop-color="#1a1a1a" />
+              <stop offset="100%" stop-color="#000000" />
+            </radialGradient>
+
+            <filter id="softBlur" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur stdDeviation="1.1" />
+            </filter>
+
+            <clipPath id="eyeClip">
+              <path d="M20,110 Q150,32 280,110 Q150,188 20,110 Z" />
+            </clipPath>
+          </defs>
+
+          <!-- Hold-progress indicator: an ellipse traced open as the hold advances -->
+          <ellipse
+            id="progressRing"
+            class="progress-ring"
+            cx="150" cy="110" rx="146" ry="101"
+          />
+
+          <!-- Everything below closes together on blink (scaleY on .eye-visual) -->
+          <g class="eye-visual" id="eyeVisual">
+            <g clip-path="url(#eyeClip)">
+              <rect x="0" y="0" width="300" height="220" fill="url(#scleraGradient)" />
+              <circle class="iris" cx="150" cy="110" r="52" fill="url(#irisGradient)" />
+              <circle class="iris-rim" cx="150" cy="110" r="52" fill="none" />
+              <g class="pupil-scale" id="pupilScale" style="transform-origin:150px 110px;">
+                <g id="pupilTrack">
+                  <circle class="pupil" cx="150" cy="110" r="22" fill="url(#pupilGradient)" />
+                </g>
+              </g>
+              <circle class="highlight" cx="133" cy="90" r="6" fill="#f7f3e8" filter="url(#softBlur)" />
+              <circle class="highlight highlight--soft" cx="163" cy="128" r="3.2" fill="#f7f3e8" filter="url(#softBlur)" />
+            </g>
+            <path class="eye-outline" d="M20,110 Q150,32 280,110 Q150,188 20,110 Z" fill="none" />
+          </g>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MAIN SITE (revealed after the eye) ================= -->
+  <main id="site" class="site" hidden>
+
+    <section class="home" id="home">
+      <div class="home-inner">
+        <p class="wordmark">VANTAGE</p>
+        <h1 class="home-heading" tabindex="-1" id="siteHeading">
+          We study what<br />
+          most choose not to see.
+        </h1>
+        <p class="lede">
+          Vantage is a private advisory practice working with institutions,
+          families, and founders on decisions that unfold over decades rather
+          than quarters. Our counsel sits quietly behind a small number of
+          long relationships.
+        </p>
+        <a class="inquiry-link" href="#inquiry">
+          <span>Inquiry</span>
+          <span class="inquiry-arrow" aria-hidden="true">→</span>
+        </a>
+      </div>
+    </section>
+
+    <section class="inquiry" id="inquiry">
+      <div class="inquiry-inner">
+        <h2>Begin a conversation</h2>
+        <p>
+          We take on a small number of new relationships each year, by
+          introduction or direct enquiry. Write to us, briefly, and someone
+          will respond.
+        </p>
+        <a class="inquiry-email" href="mailto:desk@vantage.example">desk@vantage.example</a>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>

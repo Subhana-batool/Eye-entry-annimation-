@@ -1,0 +1,324 @@
+/* =====================================================================
+   VANTAGE — design tokens
+   The eye's own iris colour (a quiet brass/gold) is reused as the site's
+   single accent, so the opening mark and the site read as one identity.
+   ===================================================================== */
+:root {
+  --bg:            #08080a;
+  --bg-deep:       #050506;
+  --ink:           #ece7dc;
+  --ink-dim:       #948d7d;
+  --line:          rgba(236, 231, 220, 0.12);
+  --accent:        #c7a24b;
+  --accent-dim:    rgba(199, 162, 75, 0.55);
+
+  --font-display:  "Fraunces", "Iowan Old Style", Georgia, serif;
+  --font-body:     "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+  --hold-duration: 1700ms;   /* how long the user must hold — kept in sync with script.js HOLD_DURATION */
+  --blink-duration: 420ms;   /* single blink animation length */
+  --transition-duration: 1400ms; /* eye → site cross-fade */
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --blink-duration: 220ms;
+    --transition-duration: 700ms;
+  }
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+body.is-locked { overflow: hidden; height: 100%; }
+
+::selection { background: var(--accent-dim); color: #100d05; }
+
+:focus-visible {
+  outline: 1px solid var(--accent);
+  outline-offset: 4px;
+}
+
+/* ---------------------------------------------------------------------
+   Skip link — invisible until focused
+--------------------------------------------------------------------- */
+.skip-link {
+  position: fixed;
+  top: -60px;
+  left: 24px;
+  z-index: 100;
+  background: var(--bg);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  padding: 10px 18px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: top 200ms ease;
+}
+.skip-link:focus { top: 24px; }
+
+/* =====================================================================
+   EYE EXPERIENCE
+   ===================================================================== */
+.eye-experience {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(ellipse at 50% 42%, #101013 0%, var(--bg) 46%, var(--bg-deep) 100%);
+  overflow: hidden;
+  transition:
+    opacity var(--transition-duration) cubic-bezier(0.65, 0, 0.35, 1),
+    filter var(--transition-duration) cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+/* faint film-grain texture for an editorial, non-flat feel */
+.eye-noise {
+  position: absolute;
+  inset: -10%;
+  opacity: 0.05;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  mix-blend-mode: overlay;
+}
+
+/* Leaving state: eye experience fades and lifts away to reveal the site */
+.eye-experience.is-leaving {
+  opacity: 0;
+  filter: blur(6px);
+  pointer-events: none;
+}
+
+.eye-stage {
+  position: relative;
+  width: min(46vw, 380px);
+  min-width: 220px;
+  aspect-ratio: 300 / 220;
+  /* gentle idle bob, paused the instant interaction begins */
+  animation: idleFloat 6s ease-in-out infinite;
+}
+.eye-stage.is-active { animation-play-state: paused; }
+
+@keyframes idleFloat {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-4px); }
+}
+
+.eye-stage-inner {
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+  /* prevents the browser from trying to scroll/pan while the user
+     is pressing and holding on a touch device */
+  touch-action: none;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+.eye-stage-inner:focus-visible { outline: none; } /* focus ring supplied by ring element below instead */
+
+#eyeSvg { width: 100%; height: 100%; overflow: visible; display: block; }
+
+/* Hold-progress ring, hidden until a hold begins */
+.progress-ring {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 1;
+  opacity: 0;
+  transition: opacity 260ms ease;
+}
+.eye-stage-inner:focus-visible ~ svg .progress-ring,
+#eyeHit:focus-visible .progress-ring {
+  opacity: 0.35;
+}
+
+/* The whole eye — outline, sclera, iris, pupil — closes together on blink */
+.eye-visual {
+  transform: scaleY(1);
+  transform-box: fill-box;
+  transform-origin: 50% 58%;
+  transition: transform 260ms cubic-bezier(0.33, 1, 0.68, 1);
+}
+
+.eye-outline {
+  stroke: var(--ink);
+  stroke-width: 1.1;
+  opacity: 0.55;
+  transition: opacity 400ms ease, stroke 400ms ease;
+}
+
+.iris-rim {
+  stroke: rgba(0,0,0,0.35);
+  stroke-width: 1;
+}
+
+.iris {
+  transition: filter 500ms ease;
+}
+
+.pupil { transition: r 500ms ease; }
+
+.highlight { opacity: 0.9; }
+.highlight--soft { opacity: 0.35; }
+
+/* Subtle response while the pointer merely rests over the eye (not holding) */
+#eyeHit:hover .eye-outline { opacity: 0.85; }
+#eyeHit:hover .iris { filter: brightness(1.04); }
+
+/* Subtle "alive" feedback while actively holding */
+.eye-stage-inner.is-holding .iris { filter: brightness(1.1) saturate(1.08); }
+.eye-stage-inner.is-holding .pupil-scale { transform: scale(1.06); }
+.eye-stage-inner.is-holding ~ .progress-ring,
+.eye-stage-inner.is-holding .progress-ring { opacity: 0.9; }
+.pupil-scale { transition: transform 260ms cubic-bezier(0.33, 1, 0.68, 1); }
+
+/* The progress ring lives as a sibling inside the same svg, so target it
+   through the parent state class placed on #eyeHit */
+#eyeHit.is-holding svg .progress-ring { opacity: 0.9; }
+#eyeHit.is-resetting svg .progress-ring { opacity: 0; transition: opacity 380ms ease; }
+
+/* Blink keyframes: fast close, slightly slower, natural re-open */
+@keyframes blinkOnce {
+  0%   { transform: scaleY(1); }
+  42%  { transform: scaleY(0.045); }
+  60%  { transform: scaleY(0.045); }
+  100% { transform: scaleY(1); }
+}
+.eye-visual.is-blinking {
+  animation: blinkOnce var(--blink-duration) cubic-bezier(0.61, 0.01, 0.39, 1) 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .eye-stage { animation: none; }
+  #eyeHit:hover .iris,
+  .eye-stage-inner.is-holding .iris { filter: none; }
+}
+
+/* =====================================================================
+   MAIN SITE
+   ===================================================================== */
+.site {
+  background: var(--bg);
+  color: var(--ink);
+  opacity: 0;
+  transition: opacity 1100ms ease;
+}
+.site.is-visible { opacity: 1; }
+
+.site[hidden] { display: none; }
+
+.home,
+.inquiry {
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  padding: 8vh 8vw;
+  border-bottom: 1px solid var(--line);
+}
+
+.home-inner,
+.inquiry-inner {
+  max-width: 720px;
+}
+
+.wordmark {
+  margin: 0 0 clamp(28px, 6vh, 56px);
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.32em;
+  color: var(--ink-dim);
+}
+
+.home-heading {
+  margin: 0 0 28px;
+  font-family: var(--font-display);
+  font-weight: 340;
+  font-style: italic;
+  font-size: clamp(2.4rem, 5.6vw, 4.6rem);
+  line-height: 1.08;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+.home-heading:focus { outline: none; } /* focused programmatically for a11y, not by pointer */
+
+.lede {
+  margin: 0 0 44px;
+  max-width: 46ch;
+  font-size: 17px;
+  line-height: 1.7;
+  color: var(--ink-dim);
+  font-weight: 400;
+}
+
+.inquiry-link,
+.inquiry-email {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink);
+  text-decoration: none;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--line);
+  transition: color 240ms ease, border-color 240ms ease, gap 240ms ease;
+}
+.inquiry-link:hover,
+.inquiry-email:hover {
+  color: var(--accent);
+  border-color: var(--accent-dim);
+  gap: 16px;
+}
+.inquiry-arrow { transition: transform 240ms ease; }
+.inquiry-link:hover .inquiry-arrow { transform: translateX(2px); }
+
+.inquiry { border-bottom: none; }
+.inquiry h2 {
+  margin: 0 0 20px;
+  font-family: var(--font-display);
+  font-weight: 340;
+  font-style: italic;
+  font-size: clamp(1.9rem, 4vw, 3rem);
+  color: var(--ink);
+}
+.inquiry p {
+  margin: 0 0 32px;
+  max-width: 46ch;
+  font-size: 16px;
+  line-height: 1.7;
+  color: var(--ink-dim);
+}
+
+/* =====================================================================
+   RESPONSIVE
+   ===================================================================== */
+@media (max-width: 720px) {
+  .eye-stage { width: min(64vw, 300px); }
+  .home, .inquiry { padding: 7vh 7vw; }
+}
+
+@media (max-width: 420px) {
+  .eye-stage { width: 74vw; }
+}
+
+@media (orientation: landscape) and (max-height: 480px) {
+  .eye-stage { width: min(38vh, 320px); }
+}
